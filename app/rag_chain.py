@@ -1,6 +1,18 @@
+import os
+from operator import itemgetter
+
+from langchain_community.vectorstores.pgvector import PGVector
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+
+from config import PG_COLLECTION_NAME
+
+vector_store = PGVector(
+    collection_name=PG_COLLECTION_NAME,
+    connection_string="postgresql+psycopg://postgres@localhost:5432/pdf_rag_vectors",
+    embedding_function=OpenAIEmbeddings()
+)
 
 template = """
 Answer given following context:
@@ -17,8 +29,9 @@ llm = ChatOpenAI(
     streaming=True,
 )
 
-final_chain = ANSWER_PROMPT | llm | StrOutputParser()
+final_chain = {"context": itemgetter("question") | vector_store.as_retriever(),
+               "question": itemgetter("question")} | ANSWER_PROMPT | llm | StrOutputParser()
 
-FINAL_CHAIN_INVOKE = final_chain.invoke({"context": "", "question": "what are examples of distributed system"})
+FINAL_CHAIN_INVOKE = final_chain.invoke({"question": "What would help create cleaner energy production in india?"})
 
 print(FINAL_CHAIN_INVOKE)

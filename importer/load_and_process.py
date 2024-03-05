@@ -1,8 +1,10 @@
 import os
+
+from dotenv import load_dotenv
 from langchain_community.document_loaders import DirectoryLoader, UnstructuredPDFLoader
 from langchain_community.vectorstores.pgvector import PGVector
-from langchain_openai import OpenAIEmbeddings
 from langchain_experimental.text_splitter import SemanticChunker
+from langchain_openai import OpenAIEmbeddings
 
 from config import EMBEDDING_MODEL, PG_COLLECTION_NAME
 
@@ -13,6 +15,7 @@ loader = DirectoryLoader(
     show_progress=True,
     max_concurrency=50,
     loader_cls=UnstructuredPDFLoader,
+    sample_size=2
 )
 
 docs = loader.load()
@@ -26,6 +29,7 @@ text_splitter = SemanticChunker(
 )
 
 chunks = text_splitter.split_documents(docs)
+
 
 PGVector.from_documents(
     documents=chunks,
