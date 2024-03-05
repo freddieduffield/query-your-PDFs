@@ -1,5 +1,6 @@
 import os
 from operator import itemgetter
+from typing import TypedDict
 
 from langchain_community.vectorstores.pgvector import PGVector
 from langchain_core.output_parsers import StrOutputParser
@@ -29,9 +30,17 @@ llm = ChatOpenAI(
     streaming=True,
 )
 
-final_chain = {"context": itemgetter("question") | vector_store.as_retriever(),
-               "question": itemgetter("question")} | ANSWER_PROMPT | llm | StrOutputParser()
 
-FINAL_CHAIN_INVOKE = final_chain.invoke({"question": "What would help create cleaner energy production in india?"})
+class RagInput(TypedDict):
+    question: str
 
-print(FINAL_CHAIN_INVOKE)
+
+final_chain = (
+        {
+            "context": itemgetter("question") | vector_store.as_retriever(),
+            "question": itemgetter("question")
+        }
+        | ANSWER_PROMPT
+        | llm
+        | StrOutputParser()
+).with_types(input_type=RagInput)
