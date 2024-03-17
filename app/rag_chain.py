@@ -3,8 +3,8 @@ from operator import itemgetter
 from typing import TypedDict
 
 from langchain_community.vectorstores.pgvector import PGVector
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableParallel
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 from config import PG_COLLECTION_NAME
@@ -36,11 +36,12 @@ class RagInput(TypedDict):
 
 
 final_chain = (
-        {
-            "context": itemgetter("question") | vector_store.as_retriever(),
-            "question": itemgetter("question")
-        }
-        | ANSWER_PROMPT
-        | llm
-        | StrOutputParser()
+    RunnableParallel(
+        context=(itemgetter("question") | vector_store.as_retriever()),
+        question=itemgetter("question")
+    ) |
+    RunnableParallel(
+        answer=(ANSWER_PROMPT | llm),
+        docs=itemgetter("context")
+    )
 ).with_types(input_type=RagInput)

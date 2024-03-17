@@ -30,7 +30,6 @@ text_splitter = SemanticChunker(
 
 chunks = text_splitter.split_documents(docs)
 
-
 PGVector.from_documents(
     documents=chunks,
     embedding=embeddings,
