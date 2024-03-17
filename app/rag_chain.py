@@ -7,7 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableParallel
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
-from config import PG_COLLECTION_NAME
+from app.config import PG_COLLECTION_NAME
 
 vector_store = PGVector(
     collection_name=PG_COLLECTION_NAME,

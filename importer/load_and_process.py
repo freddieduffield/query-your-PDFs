@@ -6,7 +6,7 @@ from langchain_community.vectorstores.pgvector import PGVector
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_openai import OpenAIEmbeddings
 
-from config import EMBEDDING_MODEL, PG_COLLECTION_NAME
+from app.config import EMBEDDING_MODEL, PG_COLLECTION_NAME
 
 loader = DirectoryLoader(
     os.path.abspath("../source_docs"),
@@ -34,6 +34,6 @@ PGVector.from_documents(
     documents=chunks,
     embedding=embeddings,
     collection_name=PG_COLLECTION_NAME,
-    connection_string="postgresql+psycopg://postgres@localhost:5432/pdf_rag_vectors",
+    connection_string=os.getenv("POSTGRES_URL"),
     pre_delete_collection=True
 )
