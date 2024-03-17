@@ -86,7 +86,7 @@ function App() {
                                                 <a
                                                     target="_blank"
                                                     download
-                                                    href={`${"http://localhost:8000"}/rag/static/${encodeURI(formatSource(source))}`}
+                                                    href={`${process.env.REACT_APP_BACKEND_URL}/rag/static/${encodeURI(formatSource(source))}`}
                                                     rel="noreferrer"
                                                 >{formatSource(source)}</a>
                                             </div>
